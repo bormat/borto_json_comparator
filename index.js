@@ -45,6 +45,8 @@ function orderArticles(a, b) {
     return getKeyForDoc(a) > getKeyForDoc(b) ? 1 : -1;
 }
 
+
+projectWithWeirdSpace = [143,165,207,257,348,355,367,429,477,478,512,546,594,609,612,620,624,656,681,715,767,872,920,923,932,934,984,1021,1049,1092,1179,1245,1270,1284,1395,1409,1412,1445,1449,1462,1474,1484,1511,1523,1542,1544,1578,1604,1632,1640,1660,1665,1722,1729,1734,1742,1744,1750,1825,1834,2159,2628,2716,2871,2938,3092,3097,3195,3227,3228,3491,3522,3605,3694,3781,3979,4045,4167,4170,4220,4259,4263,4272,4273,4436,4498,5045,5191,5204,5654,5729,5940,6006,6007,6009,6012,6221,6237,6358,6639,6647,6680,6871,7188,7258,7289,7414,7479,7509,7593,7619,7629,7711,7882,7886,7904,7920,7970,7990,7991,8140,8141,8144,8195,8211,8255,8258,8287,8375,8377,8392,8400,8436,8446,8448,8499,8688,8718,8791,8792,8794,8881,8936,8937,8956,9016,9157,9199,9241,9308,9318,9320,9375,9378,9394,9399,9443,9470,9482,9524,9716,9733,9773,9781,9787,9812,9866,9879,9884,9886,9901,9906,9941,9958,9962,9964,9979,9980,10016,10087,10091,10094,10131,10174,10203,10243,10270,10377,10461,10510,10799,10800,10819,10839,10852,10869,10911,10912,10913,10933,10942,10964,11012,11014,11037,11038,11047,11048,11050,11115,11228,11285,11324,11329,11337,11404,11550,11553,11619,11624,11651,11657,11811,11821,11844,11845,12198,12201,12203,12204,12215,12300,12321,12467,12522,12547,12549,12564,12565,12599,12609,12614,12630,12636,12686,12690,12691,12694,12695,12729,12747,12749,12783,12796,12813]
 projinpast = [9418
     ,12811
     ,7269
@@ -149,9 +151,10 @@ projinpast = [9418
 
 const weirdQuote = [12583];
 const spaceAtTheEnd = [10016, 6006, 5281];
-const ignoreTheNot = [...weirdQuote, ...spaceAtTheEnd, 11143,11338,11628, 12663, 11142];
+const ignoreTheNot = [...weirdQuote, ...spaceAtTheEnd, /*11143*/,11338,11628, 12663, 11142];
 const rubyInventMatch = [10471]
-projBroken = new Set([...ignoreTheNot,...rubyInventMatch, ...projinpast,9021/* Not not working*/, 10870 /* space*/,11746, 9308, 6012, 7414/*sergio test*/,8718, 4737/* for a misterious reason it breaks ruby*/, 10995, 9217, 8901/* end date in the past*/,1092/*same*/]);
+// const smallOr = [12592];
+projBroken = new Set([...projectWithWeirdSpace,...ignoreTheNot,...rubyInventMatch, ...projinpast,9021/* Not not working*/, 10870 /* space*/,11746, 9308, 6012, 7414/*sergio test*/,8718, 4737/* for a misterious reason it breaks ruby*/, 9217, 8901/* end date in the past*/,1092/*same*/]);
 function filterWhatCanNotBeCompared(doc){
     let jso = JSON.parse(JSON.stringify(doc));
     delete jso.debug;
@@ -166,6 +169,7 @@ function filterWhatCanNotBeCompared(doc){
                 relevancy.hits.forEach(function(hit, j){
                     relevancy.hits[j] = hit.toLowerCase();
                 })
+                relevancy.hits = relevancy.hits.filter(a => a != "or")
             }
         })
         jso.relevancy = jso.relevancy.filter(a => a)
@@ -221,6 +225,10 @@ function compare(articlesNode, articlesRuby) {
             console.log(`There is a space at the end in ruby that create match that sould not exist`);
             return false
         }
+        if(["5d8a14464672a9451e76fc14"].indexOf(id) >= 0) {
+            console.log(`There is or that is not interpreted as a keyword`);
+            return false
+        }
         return true
     })
     if(ruby_minus_node.length || node_minus_ruby.length) {
@@ -235,7 +243,7 @@ function compare(articlesNode, articlesRuby) {
         }
 
         console.error("ruby_minus_node", ruby_minus_node); // 20 with standard analyser for chinese, 19 after put standard instead of chinese  17, 2
-        console.error("node_minus_ruby", node_minus_ruby); // 438, 468 454 
+        console.error("node_minus_ruby", node_minus_ruby); // 438, 468 454 164
         console.error("some articles are not in both queue");
 
 //         "污"
@@ -257,35 +265,35 @@ function compare(articlesNode, articlesRuby) {
         }
         // console.log("the first article in node that is not in ruby is ")
         const words = {};
-        // node_minus_ruby.forEach(function name(id, lll) {
-        //     const words2 = {}
-        //     const art = idToNode[id];
-        //     if(art.article_language == "en"){
-        //         if(["5d8a148d4672a9451e770480","5d8a14ec4672a9451e7710d5","5d8a146d4672a9451e77006b"].indexOf(id) > 0) return;
-        //         art.relevancy.forEach(function name(rel) {
-        //             // if(rel.hits.indexOf("and") < 0 && rel.hits.indexOf("at") < 0 && rel.hits.indexOf("to") && rel.hits.indexOf("ARCADIA") < 0){
-        //             //     if(rel.hits.indexOf("Trump") < 0 && rel.hits.indexOf("SOCCER") < 0){
-        //             //         console.log("test")
-        //             //         // debugger;
-        //             //     }
-        //             // }
-        //             rel.hits.forEach(function(hit, j){
-        //                 // if(["FDA","food","reveal","media","coverage", "WeChat","memory","Microsoft", "不合","回收","污染", "ice", "recall", "additives","格","记","忆","II"].indexOf(hit) <= 0){
-        //                 //     console.log("match", rel, art,id)
-        //                 // };
-        //                 if(hit == "food"){
-        //                     console.log("match", rel, art,id, lll)
-        //                 }
-        //                 words2[hit] =  1 + (words2[hit] || 0)
-        //             })
-        //             console.log("-9--")
-        //             // console.log(rel.hits[0]);
-        //         })
-        //     }
-        //     Object.keys(words2).forEach(function name(word) {
-        //         words[word] =  1 + (words[word] || 0)
-        //     })
-        // })
+        node_minus_ruby.forEach(function name(id, lll) {
+            const words2 = {}
+            const art = idToNode[id];
+            // if(art.article_language == "en"){
+                if(["5d8a148d4672a9451e770480","5d8a14ec4672a9451e7710d5","5d8a146d4672a9451e77006b"].indexOf(id) > 0) return;
+                art.relevancy.forEach(function name(rel) {
+                    // if(rel.hits.indexOf("and") < 0 && rel.hits.indexOf("at") < 0 && rel.hits.indexOf("to") && rel.hits.indexOf("ARCADIA") < 0){
+                    //     if(rel.hits.indexOf("Trump") < 0 && rel.hits.indexOf("SOCCER") < 0){
+                    //         console.log("test")
+                    //         // debugger;
+                    //     }
+                    // }
+                    rel.hits.forEach(function(hit, j){
+                        // if(["FDA","food","reveal","media","coverage", "WeChat","memory","Microsoft", "不合","回收","污染", "ice", "recall", "additives","格","记","忆","II"].indexOf(hit) <= 0){
+                        //     console.log("match", rel, art,id)
+                        // };
+                        // if(hit == "food"){
+                        //     console.log("match", rel, art,id, lll)
+                        // }
+                        words2[hit] =  1 + (words2[hit] || 0)
+                    })
+                    console.log("-9--")
+                    // console.log(rel.hits[0]);
+                })
+            // }
+            Object.keys(words2).forEach(function name(word) {
+                words[word] =  1 + (words[word] || 0)
+            })
+        })
         console.log(Object.entries(words).sort((a, b) => b[1] - a[1]));
         // debugger;
     }
@@ -495,11 +503,18 @@ function compare(articlesNode, articlesRuby) {
     const toCheck = [];
     for(let arti of artiNodeRuby){
         const _a = arti.node, _b = arti.ruby;
+        // 10995 space at the end of request
         if(arti.ruby.length == arti.node.length){
             ++iij
         }
+        if(arti.ruby != arti.node){
+            //
+        }
         if(arti.ruby.length > arti.node.length){
             ++iij;
+            if(arti.ruby.indexOf(11143) >= 0){
+                console.log("11443");
+            }
             if(arti.nodeObj._id == "5d8a148c4672a9451e77045d") {
                 console.log("node is right there is shell in the headline");
                 cont++;continue;
@@ -516,11 +531,7 @@ function compare(articlesNode, articlesRuby) {
                 console.error("reactivate the patch for and can solve this problem");
                 cont++;continue;
             }
-            // 10995 space at the end of request
-            if(["5d8a14884672a9451e7703dc"].indexOf(arti.nodeObj._id) >=0) {
-                console.log("the article match by node is good and ruby match bad doc because of space in the queries");
-                cont++;continue;
-            }
+
             if(["5d8a14824672a9451e770302"].indexOf(arti.nodeObj._id) >=0) {
                 console.log("the article match the project 10138 and it is normal");
                 cont++;continue;
