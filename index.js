@@ -1,4 +1,5 @@
 const fs = require("fs");
+const request = require("request");
 function defComp(a, b){ 
     return a > b ? 1 : -1;
 }
@@ -603,7 +604,135 @@ function compare(articlesNode, articlesRuby) {
 
 const strNode = fs.readFileSync("./articlesNode.json");
 const strRuby = fs.readFileSync("./articlesRuby.json");
-const articlesNode = JSON.parse(strNode);
-const articlesRuby = JSON.parse(strRuby);
 
-compare(articlesNode, articlesRuby);
+const articlesNode = JSON.parse(strNode);
+let ind = JSON.stringify(articlesNode.body.searches).indexOf("EMPOWERING")
+console.log(JSON.stringify(articlesNode.body.searches).slice(ind-20, ind + 50))
+
+request.post({
+    url: "http://localhost:9292/process",
+    headers: articlesNode.headers,
+    json: articlesNode.body
+}, function(err, res, body) {
+    const error = err || body.error
+    if (error) {
+        console.error(error);    
+    }
+    console.log(body)
+    const stringifyExpected = stringify({
+        "10834": 
+        {
+            "hits": [
+                "company",
+                "her",
+                "that",
+                "the",
+                "time"
+            ],
+        },
+        "11999": 
+        {
+            "hits": [
+                "innovation"
+            ],
+            "tags": [
+                
+                {
+                    "category": "Products",
+                    "name": "Innovation",
+                }
+            ],
+        },
+        "7414": 
+        {
+            "hits": [
+                "EMPOWERING"
+            ],
+            "tags": [
+                
+                {
+                    "category": "Places",
+                    "name": "MANPOWER",
+                }
+            ],
+        },
+        "916": 
+        {
+            "hits": [
+                "innovation"
+            ],
+            "tags": [
+                
+                {
+                    "category": "Products",
+                    "name": "Innovation",
+                }
+            ],
+        },
+        "9655": 
+        {
+            "hits": [
+                "law"
+            ],
+            "tags": [
+                
+                {
+                    "category": "Products",
+                    "name": "Tobacco",
+                }
+            ],
+        },
+        "article_tags": [
+            
+            {
+                "category": "Brand",
+                "id": 1522,
+            }
+        ]
+    })
+    if(stringify(body) != stringifyExpected){
+        console.error("result is different")
+    }else{
+        console.log("result is Ok")
+    }
+    debugger
+});
+const data = JSON.stringify(articlesNode.body);
+  
+// const options = {
+//     hostname: "localhost",
+//     port: 9292,
+//     path: "/process",
+//     method: 'POST',
+//     headers: {
+//         'Content-Type': 'application/json',
+//         'Content-Length': data.length
+//     }
+// }
+  
+// resu = ""
+// const http = require("http")
+// const req = http.request(options, (res) => {
+//     console.log(`statusCode: ${res.statusCode}`)
+//     res.on('data', (d) => {
+//         resu += d.toString("binary")
+//     })
+// })
+
+// req.on('error', (error) => {
+//     console.error(error)
+// })
+
+// req.on('end', () => {
+//     try{
+//         toto = JSON.parse(toto);
+//     }catch(e){}
+//     console.log(toto);
+// })
+
+// req.write(data)
+// req.end()
+
+// const articlesRuby = JSON.parse(strRuby);
+
+// compare(articlesNode, articlesRuby);
