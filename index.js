@@ -178,6 +178,7 @@ function filterWhatCanNotBeCompared(doc){
     return jso;
 }
 function compare(articlesNode, articlesRuby) {
+    "test";
     var a = articlesNode.map(a => a._id);
     var b = articlesRuby.map(a => a._id);
     let ruby_minus_node = bMinuA(a, b); //135 111 26
